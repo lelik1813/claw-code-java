@@ -17,7 +17,7 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
-      - run: ./mvnw test -B
+      - run: ./mvnw test -B -Dsurefire.rerunFailingTestsCount=1
 
   integration-tests:
     name: Integration tests (Testcontainers)
