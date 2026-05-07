@@ -43,7 +43,7 @@ jobs:
           java-version: '21'
           cache: maven
       - name: Build JAR
-        run: ./mvnw package -DskipTests -B
+        run: ./mvnw package -DskipUnitTests=true -B
       - name: Start server
         run: |
           java -jar target/claw-code-java-*.jar \

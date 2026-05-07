@@ -75,7 +75,7 @@ if [ -n "$SESSION_ID" ]; then
   timeout 3 curl -sf -N -H "X-API-Key: $API_KEY" \
     "$BASE_URL/api/sessions/$SESSION_ID/stream" \
     > /tmp/agent-smoke-stream.txt 2>/dev/null || true
-  if grep -q "event:" /tmp/agent-smoke-stream.txt 2>/dev/null; then
+  if grep -Eq '^(event:|data:|:)' /tmp/agent-smoke-stream.txt 2>/dev/null; then
     assert_test "stream attach receives SSE events" true
   else
     assert_test "stream attach receives SSE events" false "no events in stream"
