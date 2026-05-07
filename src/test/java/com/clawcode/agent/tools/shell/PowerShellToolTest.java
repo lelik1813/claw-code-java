@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
@@ -29,6 +30,7 @@ class PowerShellToolTest {
 
     @Test
     void allowedCommandExecutesSuccessfully() {
+        assumePowerShellAvailable();
         PowerShellTool tool = new PowerShellTool(30);
 
         StepVerifier.create(tool.execute(Map.of("command", "Get-Date"), null))
@@ -46,6 +48,7 @@ class PowerShellToolTest {
 
     @Test
     void allowedCommandWithArgs() {
+        assumePowerShellAvailable();
         PowerShellTool tool = new PowerShellTool(30);
 
         StepVerifier.create(tool.execute("Get-Location", null))
@@ -62,6 +65,7 @@ class PowerShellToolTest {
 
     @Test
     void stderrPreservedSeparately() {
+        assumePowerShellAvailable();
         PowerShellTool tool = new PowerShellTool(30);
 
         StepVerifier.create(tool.execute("Get-Date ; [Console]::Error.WriteLine('ps-stderr-marker')", null))
@@ -303,6 +307,7 @@ class PowerShellToolTest {
 
     @Test
     void timeoutKillsProcess() {
+        assumePowerShellAvailable();
         PowerShellTool tool = new PowerShellTool(1);
 
         StepVerifier.create(tool.execute("Start-Sleep -Seconds 60", null))
@@ -314,6 +319,7 @@ class PowerShellToolTest {
 
     @Test
     void nonZeroExitIncludesSeparatedStdoutAndStderr() {
+        assumePowerShellAvailable();
         PowerShellTool tool = new PowerShellTool(30);
 
         StepVerifier.create(tool.execute(
@@ -337,7 +343,7 @@ class PowerShellToolTest {
 
     @Test
     void dotSlashPrefixExtractsBaseCommand() {
-        PowerShellTool tool = new PowerShellTool(30);
+        PowerShellTool tool = stubbedPowerShellTool();
 
         StepVerifier.create(tool.execute("./mvnw --version", null))
             .expectNextCount(1)
@@ -346,7 +352,7 @@ class PowerShellToolTest {
 
     @Test
     void dotBackslashMvnwCmdPathAllowed() {
-        PowerShellTool tool = new PowerShellTool(30);
+        PowerShellTool tool = stubbedPowerShellTool();
 
         StepVerifier.create(tool.execute(".\\mvnw.cmd --version", null))
             .expectNextCount(1)
@@ -355,11 +361,38 @@ class PowerShellToolTest {
 
     @Test
     void quotedMvnwCmdPathAllowed() {
-        PowerShellTool tool = new PowerShellTool(30);
+        PowerShellTool tool = stubbedPowerShellTool();
         String mvnw = Path.of("mvnw.cmd").toAbsolutePath().toString();
 
         StepVerifier.create(tool.execute("& \"" + mvnw + "\" --version", null))
             .expectNextCount(1)
             .verifyComplete();
+    }
+
+    private static PowerShellTool stubbedPowerShellTool() {
+        return new PowerShellTool(30) {
+            @Override
+            PowerShellResult runCommand(String command) {
+                return new PowerShellResult(command, 0, "ok", "", false);
+            }
+        };
+    }
+
+    private static void assumePowerShellAvailable() {
+        Assumptions.assumeTrue(commandExists("powershell"),
+            "PowerShell executable is not available on this runner");
+    }
+
+    private static boolean commandExists(String command) {
+        try {
+            Process process = new ProcessBuilder(command, "-NoProfile", "-Command", "$PSVersionTable.PSVersion")
+                .start();
+            return process.waitFor() == 0;
+        } catch (IOException e) {
+            return false;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return false;
+        }
     }
 }

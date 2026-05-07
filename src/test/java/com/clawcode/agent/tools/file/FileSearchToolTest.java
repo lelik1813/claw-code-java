@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Locale;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
@@ -217,8 +218,12 @@ class FileSearchToolTest {
     @Test
     void rgExit1NoMatchesSkipsJavaFallback() throws IOException {
         // Fake rg that exits 1 (no matches) — Java fallback would find the match
-        Path script = Path.of("target").resolve("rg-fake-nomatch.bat");
-        Files.writeString(script, "@exit /b 1");
+        boolean windows = System.getProperty("os.name", "").toLowerCase(Locale.ROOT).contains("win");
+        Path script = Path.of("target").resolve(windows ? "rg-fake-nomatch.bat" : "rg-fake-nomatch.sh");
+        Files.writeString(script, windows ? "@exit /b 1" : "#!/usr/bin/env sh\nexit 1\n");
+        if (!windows) {
+            script.toFile().setExecutable(true);
+        }
 
         FileSearchTool noMatchRgTool = new FileSearchTool();
         noMatchRgTool.rgCommand = script.toAbsolutePath().toString();
