@@ -3,7 +3,9 @@
 [![CI](https://github.com/lelik1813/claw-code-java/actions/workflows/ci.yml/badge.svg)](https://github.com/lelik1813/claw-code-java/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-![Claw Code Java](assets/claw-code-java.png)
+<p align="center">
+  <img src="assets/claw-code-java.png" alt="Claw Code Java" width="300" />
+</p>
 
 Claw Code Java is a Java 21 implementation of a reactive agent server and CLI harness. It ships a Spring Boot WebFlux API, an interactive command-line client, pluggable tool execution, MCP transports, skill and plugin loading, session replay, and optional PostgreSQL persistence.
 
