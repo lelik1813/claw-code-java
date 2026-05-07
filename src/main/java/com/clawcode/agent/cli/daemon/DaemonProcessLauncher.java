@@ -1,6 +1,7 @@
 package com.clawcode.agent.cli.daemon;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
@@ -31,8 +32,10 @@ public interface DaemonProcessLauncher {
 
                 var pb = new ProcessBuilder(command);
                 pb.environment().putAll(request.environment());
-                pb.redirectOutput(ProcessBuilder.Redirect.DISCARD);
-                pb.redirectError(ProcessBuilder.Redirect.DISCARD);
+                Path logDir = Path.of(System.getProperty("user.home"), ".agent-cli", "logs");
+                Files.createDirectories(logDir);
+                pb.redirectOutput(ProcessBuilder.Redirect.appendTo(logDir.resolve("daemon.out.log").toFile()));
+                pb.redirectError(ProcessBuilder.Redirect.appendTo(logDir.resolve("daemon.err.log").toFile()));
                 pb.directory(Path.of(System.getProperty("user.home")).toFile());
                 var process = pb.start();
                 return new StartedDaemonProcess(process.pid(), process::destroyForcibly);

@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -167,7 +168,8 @@ public class LaunchCommand implements Callable<Integer> {
         }
 
         try {
-            var process = processLauncher.start(new DaemonLaunchRequest(jar, port, env, null));
+            var process = processLauncher.start(new DaemonLaunchRequest(
+                jar, port, env, appArgsFor(env)));
             boolean ready = healthChecker.waitUntilReady(port, Duration.ofSeconds(30));
             if (!ready) {
                 process.destroyForcibly();
@@ -224,6 +226,23 @@ public class LaunchCommand implements Callable<Integer> {
     private static String normalizeBackend(String value) {
         String normalized = value == null ? "in-memory" : value.strip().toLowerCase();
         return "postgres".equals(normalized) ? "postgres" : "in-memory";
+    }
+
+    private static List<String> appArgsFor(Map<String, String> env) {
+        String backend = normalizeBackend(env.get("PERSISTENCE_BACKEND"));
+        if (!"in-memory".equals(backend)) {
+            return List.of("--app.persistence.backend=" + backend);
+        }
+        return List.of(
+            "--app.persistence.backend=in-memory",
+            "--spring.autoconfigure.exclude="
+                + "org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration,"
+                + "org.springframework.boot.r2dbc.autoconfigure.R2dbcAutoConfiguration,"
+                + "org.springframework.boot.r2dbc.autoconfigure.R2dbcDataAutoConfiguration,"
+                + "org.springframework.boot.r2dbc.autoconfigure.R2dbcRepositoriesAutoConfiguration,"
+                + "org.springframework.boot.r2dbc.autoconfigure.R2dbcTransactionManagerAutoConfiguration,"
+                + "org.springframework.boot.flyway.autoconfigure.FlywayAutoConfiguration"
+        );
     }
 
     private static String existingJar(String raw) {

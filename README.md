@@ -47,7 +47,7 @@ cd claw-code-java
 Build the standalone JAR:
 
 ```bash
-./mvnw package -DskipTests -B
+./mvnw package -DskipUnitTests=true -B
 java -jar target/claw-code-java-*.jar
 ```
 
@@ -58,7 +58,7 @@ The default server listens on `http://localhost:8080`.
 Build once, then start the local server and open the REPL from one command:
 
 ```bash
-./mvnw package -DskipTests -B
+./mvnw package -DskipUnitTests=true -B
 ./mvnw exec:java \
   -Dexec.mainClass=com.clawcode.agent.cli.AgentCliApplication \
   -Dexec.args="launch"
@@ -67,7 +67,7 @@ Build once, then start the local server and open the REPL from one command:
 PowerShell:
 
 ```powershell
-.\mvnw.cmd package -DskipTests -B
+.\mvnw.cmd package -DskipUnitTests=true -B
 .\mvnw.cmd exec:java `
   "-Dexec.mainClass=com.clawcode.agent.cli.AgentCliApplication" `
   "-Dexec.args=launch"
