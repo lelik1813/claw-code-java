@@ -69,8 +69,8 @@ PowerShell:
 ```powershell
 .\mvnw.cmd package -DskipTests -B
 .\mvnw.cmd exec:java `
-  -Dexec.mainClass=com.clawcode.agent.cli.AgentCliApplication `
-  -Dexec.args="launch"
+  "-Dexec.mainClass=com.clawcode.agent.cli.AgentCliApplication" `
+  "-Dexec.args=launch"
 ```
 
 On first launch, the CLI writes local runtime settings under `~/.agent-cli`, starts the background daemon with API-key auth enabled, stores the matching CLI credentials, and opens the REPL. You can pass setup values non-interactively:
@@ -154,8 +154,8 @@ PowerShell:
 
 ```powershell
 .\mvnw.cmd exec:java `
-  -Dexec.mainClass=com.clawcode.agent.cli.AgentCliApplication `
-  -Dexec.args="--help"
+  "-Dexec.mainClass=com.clawcode.agent.cli.AgentCliApplication" `
+  "-Dexec.args=--help"
 ```
 
 The CLI can connect to a running server with `APP_CLI_BASE_URL`, `APP_CLI_API_KEY_HEADER`, and `APP_CLI_API_KEY`.
