@@ -1,0 +1,16 @@
+{
+  "plugins": [
+    {
+      "id": "broken-missing-url",
+      "name": "Broken Plugin",
+      "version": "0.1.0",
+      "tools": [
+        {
+          "name": "no_url_tool",
+          "type": "http",
+          "config": {}
+        }
+      ]
+    }
+  ]
+}

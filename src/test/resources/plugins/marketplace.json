@@ -1,0 +1,43 @@
+{
+  "plugins": [
+    {
+      "id": "weather",
+      "name": "Weather Plugin",
+      "version": "1.0.0",
+      "tools": [
+        {
+          "name": "get_weather",
+          "type": "http",
+          "config": {
+            "url": "https://weather.example.com/api/current",
+            "method": "GET",
+            "timeout": 5000
+          }
+        }
+      ]
+    },
+    {
+      "id": "calculator",
+      "name": "Calculator Plugin",
+      "version": "1.2.0",
+      "tools": [
+        {
+          "name": "calc_add",
+          "type": "http",
+          "config": {
+            "url": "https://calc.example.com/add",
+            "method": "POST"
+          }
+        },
+        {
+          "name": "calc_multiply",
+          "type": "http",
+          "config": {
+            "url": "https://calc.example.com/multiply",
+            "method": "POST"
+          }
+        }
+      ]
+    }
+  ]
+}

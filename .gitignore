@@ -1,0 +1,23 @@
+# Build output
+target/
+
+# IDE/local workspace files
+.idea/
+*.iml
+.vscode/
+.claude/
+
+# Local environment files
+.env
+.env.*
+!.env.example
+!.env.production.example
+
+# Logs and temporary files
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+
+# Maven wrapper jar is intentionally not published; mvnw downloads it
+.mvn/wrapper/maven-wrapper.jar

@@ -1,0 +1,3 @@
+org.springframework.boot.env.EnvironmentPostProcessor=\
+com.clawcode.agent.config.DotenvEnvironmentPostProcessor,\
+com.clawcode.agent.config.R2dbcPropertyPostProcessor

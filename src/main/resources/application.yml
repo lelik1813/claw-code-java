@@ -1,0 +1,114 @@
+spring:
+  application:
+    name: claw-code-java
+
+server:
+  port: ${SERVER_PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus,info
+
+app:
+  persistence:
+    backend: ${PERSISTENCE_BACKEND:in-memory}
+  query:
+    max-tool-rounds: ${APP_QUERY_MAX_TOOL_ROUNDS:10}
+    max-model-request-chars: ${APP_QUERY_MAX_MODEL_REQUEST_CHARS:240000}
+    auto-compact-enabled: ${APP_QUERY_AUTO_COMPACT_ENABLED:true}
+    compact-preserve-recent-messages: ${APP_QUERY_COMPACT_PRESERVE_RECENT_MESSAGES:12}
+    max-output-recovery-attempts: ${APP_QUERY_MAX_OUTPUT_RECOVERY_ATTEMPTS:2}
+  tools:
+    enabled: ${APP_TOOLS_ENABLED:false}
+    mode: ${APP_TOOLS_MODE:ALLOWLIST}
+    allowed-tools: ${APP_TOOLS_ALLOWED:file_read,file_list,file_glob,file_search,file_write,powershell}
+    max-tool-concurrency: ${APP_TOOLS_MAX_TOOL_CONCURRENCY:4}
+    max-tool-result-chars: ${APP_TOOLS_MAX_RESULT_CHARS:12000}
+    tool-result-excerpt-chars: ${APP_TOOLS_RESULT_EXCERPT_CHARS:4000}
+    tool-summary-min-calls: ${APP_TOOLS_SUMMARY_MIN_CALLS:4}
+  mcp:
+    enabled: ${APP_MCP_ENABLED:false}
+    servers: {} # Uncomment and fill one of the examples below to enable a transport
+#      # --- HTTP transport (direct REST API) ---
+#      my-http:
+#        enabled: true
+#        type: HTTP
+#        base-url: ${MCP_HTTP_URL:http://localhost:3001}
+#        auth-token: ${MCP_HTTP_TOKEN:}
+#        headers: {}
+#        read-timeout-ms: 30000
+#
+#      # --- STDIO transport (subprocess JSON-RPC over stdin/stdout) ---
+#      my-stdio:
+#        enabled: true
+#        type: STDIO
+#        command: npx
+#        args:
+#          - "-y"
+#          - "@modelcontextprotocol/server-filesystem"
+#          - "/tmp"
+#        working-dir: .
+#        startup-timeout-ms: 10000
+#        env:
+#          NODE_ENV: production
+#
+#      # --- SSE transport (server-sent events + HTTP POST) ---
+#      my-sse:
+#        enabled: true
+#        type: SSE
+#        base-url: ${MCP_SSE_URL:http://localhost:3002/sse}
+#        headers:
+#          Authorization: "Bearer ${MCP_SSE_TOKEN:}"
+#        connect-timeout-ms: 30000
+#        read-timeout-ms: 300000
+  skills:
+    enabled: ${APP_SKILLS_ENABLED:false}
+    root: ${APP_SKILLS_ROOT:./skills}
+  tasks:
+    enabled: ${APP_TASKS_ENABLED:false}
+    backend: ${APP_TASKS_BACKEND:IN_MEMORY}
+    max-concurrent: ${APP_TASKS_MAX_CONCURRENT:10}
+    default-timeout-ms: ${APP_TASKS_DEFAULT_TIMEOUT_MS:300000}
+    remote:
+      base-url: ${APP_TASKS_REMOTE_BASE_URL:}
+      auth-token: ${APP_TASKS_REMOTE_AUTH_TOKEN:}
+      timeout-ms: ${APP_TASKS_REMOTE_TIMEOUT_MS:30000}
+  plugins:
+    enabled: ${APP_PLUGINS_ENABLED:false}
+    marketplace-url: ${APP_PLUGINS_MARKETPLACE_URL:}
+    directories: ${APP_PLUGINS_DIRS:}
+  web-tools:
+    enabled: ${APP_WEB_TOOLS_ENABLED:false}
+    search-enabled: ${APP_WEB_TOOLS_SEARCH_ENABLED:true}
+    fetch-enabled: ${APP_WEB_TOOLS_FETCH_ENABLED:true}
+    search-base-url: ${APP_WEB_TOOLS_SEARCH_BASE_URL:}
+    search-api-key: ${APP_WEB_TOOLS_SEARCH_API_KEY:}
+    timeout-ms: ${APP_WEB_TOOLS_TIMEOUT_MS:30000}
+    max-response-bytes: ${APP_WEB_TOOLS_MAX_RESPONSE_BYTES:1048576}
+    max-text-chars: ${APP_WEB_TOOLS_MAX_TEXT_CHARS:50000}
+    allowed-schemes: ${APP_WEB_TOOLS_ALLOWED_SCHEMES:http,https}
+    blocked-hosts: ${APP_WEB_TOOLS_BLOCKED_HOSTS:}
+  security:
+    api-key:
+      enabled: ${APP_SECURITY_API_KEY_ENABLED:false}
+      header: ${APP_SECURITY_API_KEY_HEADER:X-API-Key}
+      key: ${APP_SECURITY_API_KEY_KEY:}
+    rate-limit:
+      enabled: ${APP_RATE_LIMIT_ENABLED:false}
+      requests: ${APP_RATE_LIMIT_REQUESTS:100}
+      window-seconds: ${APP_RATE_LIMIT_WINDOW_SECONDS:60}
+    public-paths: ${APP_SECURITY_PUBLIC_PATHS:/actuator/**,/public/**}
+  cli:
+    base-url: ${APP_CLI_BASE_URL:http://localhost:8080}
+    api-key-header: ${APP_CLI_API_KEY_HEADER:X-API-Key}
+    api-key: ${APP_CLI_API_KEY:}
+    timeout-ms: ${APP_CLI_TIMEOUT_MS:30000}
+    stream-read-timeout-ms: ${APP_CLI_STREAM_READ_TIMEOUT_MS:300000}
+
+anthropic:
+  base-url: ${ANTHROPIC_BASE_URL:https://api.deepseek.com/anthropic}
+  auth-token: ${ANTHROPIC_AUTH_TOKEN:}
+  timeout-ms: ${API_TIMEOUT_MS:3000000}
+  default-model: ${ANTHROPIC_DEFAULT_SONNET_MODEL:deepseek-v4-flash}
