@@ -5,7 +5,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.clawcode.agent.tools.ToolExecutionContext;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
@@ -379,15 +381,23 @@ class PowerShellToolTest {
     }
 
     private static void assumePowerShellAvailable() {
-        Assumptions.assumeTrue(commandExists("powershell"),
+        Assumptions.assumeTrue(isWindows() && commandExists("powershell"),
             "PowerShell executable is not available on this runner");
+    }
+
+    private static boolean isWindows() {
+        return System.getProperty("os.name", "").toLowerCase(Locale.ROOT).contains("win");
     }
 
     private static boolean commandExists(String command) {
         try {
             Process process = new ProcessBuilder(command, "-NoProfile", "-Command", "$PSVersionTable.PSVersion")
                 .start();
-            return process.waitFor() == 0;
+            if (!process.waitFor(5, TimeUnit.SECONDS)) {
+                process.destroyForcibly();
+                return false;
+            }
+            return process.exitValue() == 0;
         } catch (IOException e) {
             return false;
         } catch (InterruptedException e) {

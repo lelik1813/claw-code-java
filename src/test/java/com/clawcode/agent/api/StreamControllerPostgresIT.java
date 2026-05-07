@@ -1,6 +1,7 @@
 package com.clawcode.agent.api;
 
 import com.clawcode.agent.core.query.QueryCompletedEvent;
+import com.clawcode.agent.core.query.QueryResultEvent;
 import com.clawcode.agent.core.query.QueryStreamStartedEvent;
 import com.clawcode.agent.core.query.QueryTextDeltaEvent;
 import com.clawcode.agent.core.session.SessionService;
@@ -115,9 +116,10 @@ class StreamControllerPostgresIT {
         var events = sessionService.stream(sessionId);
         sessionService.submitPrompt(sessionId, "hello").subscribe();
 
-        StepVerifier.create(events.take(3))
+        StepVerifier.create(events.take(4))
             .expectNextMatches(e -> e instanceof QueryStreamStartedEvent)
             .expectNextMatches(e -> e instanceof QueryTextDeltaEvent delta && delta.text().equals("noop"))
+            .expectNextMatches(e -> e instanceof QueryResultEvent result && result.success())
             .expectNextMatches(e -> e instanceof QueryCompletedEvent)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -130,9 +132,10 @@ class StreamControllerPostgresIT {
         sessionService.submitPrompt(sessionId, "hello")
             .blockLast(Duration.ofSeconds(5));
 
-        StepVerifier.create(sessionService.stream(sessionId).take(3))
+        StepVerifier.create(sessionService.stream(sessionId).take(4))
             .expectNextMatches(e -> e instanceof QueryStreamStartedEvent)
             .expectNextMatches(e -> e instanceof QueryTextDeltaEvent delta && delta.text().equals("noop"))
+            .expectNextMatches(e -> e instanceof QueryResultEvent result && result.success())
             .expectNextMatches(e -> e instanceof QueryCompletedEvent)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
