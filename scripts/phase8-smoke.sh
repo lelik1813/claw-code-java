@@ -12,10 +12,10 @@ assert_test() {
   local name="$1" result="$2" detail="${3:-}"
   if [ "$result" = true ]; then
     echo "  PASS  $name"
-    ((PASS++))
+    PASS=$((PASS + 1))
   else
     echo "  FAIL  $name ${detail:+($detail)}"
-    ((FAIL++))
+    FAIL=$((FAIL + 1))
   fi
 }
 
