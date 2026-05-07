@@ -16,10 +16,13 @@ public final class ConfigKeySpec {
         add("apiKeyHeader", Type.STRING, "X-API-Key");
         add("timeoutMs", Type.POSITIVE_LONG, "30000");
         add("streamReadTimeoutMs", Type.POSITIVE_LONG, "300000");
+        add("serverPort", Type.PORT, "8080");
+        add("serverJar", Type.STRING, "auto");
+        add("persistenceBackend", Type.PERSISTENCE_BACKEND, "in-memory");
     }
 
     public enum Type {
-        STRING, URL, POSITIVE_LONG
+        STRING, URL, POSITIVE_LONG, PORT, PERSISTENCE_BACKEND
     }
 
     record Spec(Type type, String defaultValue) {}
@@ -58,6 +61,8 @@ public final class ConfigKeySpec {
         switch (spec.type()) {
             case URL -> validateUrl(value);
             case POSITIVE_LONG -> validatePositiveLong(value);
+            case PORT -> validatePort(value);
+            case PERSISTENCE_BACKEND -> validatePersistenceBackend(value);
             case STRING -> {} // any non-blank string is ok
         }
     }
@@ -83,6 +88,26 @@ public final class ConfigKeySpec {
         }
         if (parsed <= 0) {
             throw new ValidationException("value must be positive: " + value);
+        }
+    }
+
+    private static void validatePort(String value) {
+        int parsed;
+        try {
+            parsed = Integer.parseInt(value.strip());
+        } catch (NumberFormatException e) {
+            throw new ValidationException("invalid port: " + value);
+        }
+        if (parsed <= 0 || parsed > 65535) {
+            throw new ValidationException("port out of range: " + value);
+        }
+    }
+
+    private static void validatePersistenceBackend(String value) {
+        String normalized = value.strip().toLowerCase();
+        if (!normalized.equals("in-memory") && !normalized.equals("postgres")) {
+            throw new ValidationException(
+                "persistenceBackend must be 'in-memory' or 'postgres'");
         }
     }
 

@@ -53,6 +53,36 @@ java -jar target/claw-code-java-*.jar
 
 The default server listens on `http://localhost:8080`.
 
+## One-Command Local Launch
+
+Build once, then start the local server and open the REPL from one command:
+
+```bash
+./mvnw package -DskipTests -B
+./mvnw exec:java \
+  -Dexec.mainClass=com.clawcode.agent.cli.AgentCliApplication \
+  -Dexec.args="launch"
+```
+
+PowerShell:
+
+```powershell
+.\mvnw.cmd package -DskipTests -B
+.\mvnw.cmd exec:java `
+  -Dexec.mainClass=com.clawcode.agent.cli.AgentCliApplication `
+  -Dexec.args="launch"
+```
+
+On first launch, the CLI writes local runtime settings under `~/.agent-cli`, starts the background daemon with API-key auth enabled, stores the matching CLI credentials, and opens the REPL. You can pass setup values non-interactively:
+
+```bash
+./mvnw exec:java \
+  -Dexec.mainClass=com.clawcode.agent.cli.AgentCliApplication \
+  -Dexec.args="launch --port 8080 --persistence in-memory --model-token <token>"
+```
+
+Use `--persistence postgres` when `POSTGRES_HOST`, `POSTGRES_PORT`, `POSTGRES_DB`, `POSTGRES_USER`, and `POSTGRES_PASSWORD` are already available in the launch environment.
+
 ## Configuration
 
 Copy one of the safe templates and fill only the values you need:

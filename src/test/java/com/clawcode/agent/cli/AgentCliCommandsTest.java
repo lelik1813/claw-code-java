@@ -3352,7 +3352,7 @@ class AgentCliCommandsTest {
                 int exit = execute();
 
                 assertThat(exit).isEqualTo(AgentCliApplication.EXIT_OK);
-                assertThat(out()).contains("Free Code Java Agent");
+                assertThat(out()).contains("Claw Code Java Agent");
             } finally {
                 System.setIn(savedIn);
             }

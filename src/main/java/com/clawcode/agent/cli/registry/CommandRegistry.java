@@ -63,6 +63,7 @@ public class CommandRegistry {
         register(CommandDescriptor.builtin("config", "Configuration operations"));
         register(CommandDescriptor.builtin("skills", "Skill discovery: list|reload"));
         register(CommandDescriptor.builtin("daemon", "Background daemon: start|status|stop"));
+        register(CommandDescriptor.builtin("launch", "Start local daemon and open REPL"));
         register(CommandDescriptor.builtin("remote", "Remote-control: status|connect|disconnect"));
         register(CommandDescriptor.builtin("repl", "Start interactive REPL"));
         register(CommandDescriptor.builtin("help", "Show available commands"));

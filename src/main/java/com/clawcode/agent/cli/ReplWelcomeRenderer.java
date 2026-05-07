@@ -31,7 +31,7 @@ final class ReplWelcomeRenderer {
             "                 "
         };
         String[] info = {
-            BOLD + "Free Code Java Agent" + RESET + " " + DIM + "v" + VERSION + RESET,
+            BOLD + "Claw Code Java Agent" + RESET + " " + DIM + "v" + VERSION + RESET,
             modelLine(),
             "~\\" + cwdLine(),
             "",

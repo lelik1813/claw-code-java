@@ -96,7 +96,7 @@ class ReplRunnerTest {
         void exitCommand_returnsOk() {
             int exit = runRepl("/exit\n");
             assertThat(exit).isEqualTo(AgentCliApplication.EXIT_OK);
-            assertThat(out()).contains("Free Code Java Agent");
+            assertThat(out()).contains("Claw Code Java Agent");
             assertThat(out()).doesNotContain("no advertised tools");
             assertThat(out()).contains("Bye.");
         }

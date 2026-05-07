@@ -56,7 +56,7 @@ class AgentCliApplicationTest {
             System.setIn(new ByteArrayInputStream("exit\n".getBytes(StandardCharsets.UTF_8)));
             int exit = execute();
             assertThat(exit).isEqualTo(AgentCliApplication.EXIT_OK);
-            assertThat(out()).contains("Free Code Java Agent");
+            assertThat(out()).contains("Claw Code Java Agent");
         } finally {
             System.setIn(savedIn);
         }
@@ -73,6 +73,7 @@ class AgentCliApplicationTest {
         assertThat(out()).contains("mcp");
         assertThat(out()).contains("plugin");
         assertThat(out()).contains("config");
+        assertThat(out()).contains("launch");
         assertThat(out()).contains("repl");
     }
 

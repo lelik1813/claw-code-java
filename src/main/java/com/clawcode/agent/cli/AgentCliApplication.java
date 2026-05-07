@@ -5,9 +5,12 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import com.clawcode.agent.cli.commands.AuthCommand;
 import com.clawcode.agent.cli.commands.ConfigCommand;
+import com.clawcode.agent.cli.commands.launch.LaunchCommand;
 import com.clawcode.agent.cli.commands.MessageSendCommand;
 import com.clawcode.agent.cli.commands.SessionCreateCommand;
 import com.clawcode.agent.cli.commands.StreamAttachCommand;
+import com.clawcode.agent.cli.auth.FileAuthStore;
+import com.clawcode.agent.cli.config.CliConfigStore;
 import com.clawcode.agent.cli.commands.daemon.DaemonCommand;
 import com.clawcode.agent.cli.commands.mcp.McpCommand;
 import com.clawcode.agent.cli.commands.plugin.PluginCommand;
@@ -38,6 +41,7 @@ import picocli.CommandLine.Spec;
         + "  config                  Configuration operations (get|set|list|unset)%n"
         + "  skills                  Skill discovery (list|reload)%n"
         + "  daemon                  Background daemon (start|status|stop)%n"
+        + "  launch                  Start local daemon and open REPL%n"
         + "  remote                  Remote-control (status|connect|disconnect)%n"
         + "  repl                    Start interactive REPL",
     subcommands = {
@@ -50,6 +54,7 @@ import picocli.CommandLine.Spec;
         ConfigCommand.class,
         SkillsCommand.class,
         DaemonCommand.class,
+        LaunchCommand.class,
         RemoteControlCommand.class,
         ReplCommand.class
     }
@@ -95,11 +100,19 @@ public class AgentCliApplication implements Callable<Integer> {
 
     public AgentApiClient client() {
         if (client == null) {
-            var props = new CliProperties(baseUrl, apiKeyHeader, apiKey, timeoutMs, streamTimeoutMs);
+            var props = resolvedCliProperties();
             client = new HttpAgentApiClient(props);
             clientCreated = true;
         }
         return client;
+    }
+
+    public void configureClient(String baseUrl, String apiKeyHeader, String apiKey) {
+        if (baseUrl != null && !baseUrl.isBlank()) this.baseUrl = baseUrl;
+        if (apiKeyHeader != null && !apiKeyHeader.isBlank()) this.apiKeyHeader = apiKeyHeader;
+        if (apiKey != null && !apiKey.isBlank()) this.apiKey = apiKey;
+        this.client = null;
+        this.clientCreated = false;
     }
 
     public boolean clientCreated() {
@@ -109,6 +122,43 @@ public class AgentCliApplication implements Callable<Integer> {
     public PrintWriter out() { return spec.commandLine().getOut(); }
     public PrintWriter err() { return spec.commandLine().getErr(); }
     public CommandSpec spec() { return spec; }
+
+    private CliProperties resolvedCliProperties() {
+        var config = new CliConfigStore();
+        var auth = new FileAuthStore().load();
+        String resolvedBaseUrl = baseUrl;
+        String resolvedApiKeyHeader = apiKeyHeader;
+        String resolvedApiKey = apiKey;
+        long resolvedTimeoutMs = timeoutMs;
+        long resolvedStreamTimeoutMs = streamTimeoutMs;
+
+        if ("http://localhost:8080".equals(baseUrl)) {
+            resolvedBaseUrl = config.get("baseUrl").orElse(baseUrl);
+        }
+        if ("X-API-Key".equals(apiKeyHeader)) {
+            resolvedApiKeyHeader = auth.map(a -> a.apiKeyHeader())
+                .orElse(config.get("apiKeyHeader").orElse(apiKeyHeader));
+        }
+        if (apiKey == null || apiKey.isBlank()) {
+            resolvedApiKey = auth.map(a -> a.apiKey()).orElse(apiKey);
+        }
+        if (timeoutMs == 30000L) {
+            resolvedTimeoutMs = parseLong(config.get("timeoutMs").orElse("30000"), 30000L);
+        }
+        if (streamTimeoutMs == 300000L) {
+            resolvedStreamTimeoutMs = parseLong(config.get("streamReadTimeoutMs").orElse("300000"), 300000L);
+        }
+        return new CliProperties(resolvedBaseUrl, resolvedApiKeyHeader,
+            resolvedApiKey, resolvedTimeoutMs, resolvedStreamTimeoutMs);
+    }
+
+    private static long parseLong(String value, long fallback) {
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException e) {
+            return fallback;
+        }
+    }
 
     @Override
     public Integer call() {

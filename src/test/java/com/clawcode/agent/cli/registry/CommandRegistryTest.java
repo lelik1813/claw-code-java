@@ -22,7 +22,7 @@ class CommandRegistryTest {
 
         assertThat(commands).isNotEmpty();
         assertThat(commands.stream().map(CommandDescriptor::name))
-            .contains("session", "message", "stream", "auth", "mcp", "plugin", "config", "skills", "repl", "help", "exit");
+            .contains("session", "message", "stream", "auth", "mcp", "plugin", "config", "skills", "daemon", "launch", "repl", "help", "exit");
     }
 
     @Test
