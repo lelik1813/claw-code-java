@@ -7,7 +7,27 @@
   <img src="assets/claw-code-java.png" alt="Claw Code Java" width="300" />
 </p>
 
-Claw Code Java is a Java 21 implementation of a reactive agent server and CLI harness. It ships a Spring Boot WebFlux API, an interactive command-line client, pluggable tool execution, MCP transports, skill and plugin loading, session replay, and optional PostgreSQL persistence.
+Claw Code Java is an experimental Java 21 / Spring Boot implementation of a Claude Code-like coding-agent runtime.
+
+It is built for developers who want to inspect, extend, and experiment with the architecture behind terminal coding agents in a Java/Spring ecosystem. The project includes a WebFlux agent server, CLI/REPL client, tool execution, MCP transports, skills/plugins, hooks, SSE streaming, session replay, and optional PostgreSQL transcript persistence.
+
+Status: early working implementation. The project runs locally and is under active development, so APIs, CLI behavior, and runtime contracts may change.
+
+Claude Code is currently more mature and performs better in real-world coding-agent workflows. This project does not claim parity today. The goal is to provide an inspectable Java/Spring-based agent stack for learning, experimentation, MCP tooling, replay, persistence, and future parity work.
+
+This project is not affiliated with Anthropic or Claude Code.
+
+## Runtime Capability Map
+
+![Runtime Capability Map](assets/architecture/runtime-capability-map.png)
+
+Claw Code Java is organized as a thin CLI client backed by a Spring Boot WebFlux agent server. The server owns the agent loop, model calls, tool execution, permission checks, transcript storage, replay, SSE streaming, and observability.
+
+## Agent Turn Lifecycle
+
+![Agent Turn Lifecycle](assets/architecture/agent-turn-lifecycle.png)
+
+The Query Orchestrator owns the turn loop: it builds provider requests, handles model tool calls, executes tools through the policy-checked Tool Executor, persists transcript messages, and streams public events back to the CLI over SSE.
 
 ## Current Repository Shape
 
@@ -48,10 +68,9 @@ Build the standalone JAR:
 
 ```bash
 ./mvnw package -DskipUnitTests=true -B
-java -jar target/claw-code-java-*.jar
 ```
 
-The default server listens on `http://localhost:8080`.
+For normal local use, start the server and REPL through the `launch` command below. It handles first-run configuration, local API-key settings, and in-memory persistence flags for the background daemon.
 
 ## One-Command Local Launch
 
@@ -107,6 +126,8 @@ APP_MCP_ENABLED=false
 For PostgreSQL persistence, set `PERSISTENCE_BACKEND=postgres` and provide the database values from `.env.production.example`.
 
 ## Run With API-Key Auth
+
+For local first-run development, prefer `launch`. Direct JAR server mode is useful when you want to run only the HTTP API and provide server settings yourself:
 
 ```bash
 java -jar target/claw-code-java-*.jar \
@@ -164,6 +185,7 @@ The CLI can connect to a running server with `APP_CLI_BASE_URL`, `APP_CLI_API_KE
 ## Development
 
 This repository is the active development workspace for Claw Code Java. For the public development workflow, local launch command, tests, and CI expectations, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## Verification
 
 Unit tests:
