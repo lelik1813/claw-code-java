@@ -160,6 +160,10 @@ PowerShell:
 
 The CLI can connect to a running server with `APP_CLI_BASE_URL`, `APP_CLI_API_KEY_HEADER`, and `APP_CLI_API_KEY`.
 
+
+## Development
+
+This repository is the active development workspace for Claw Code Java. For the public development workflow, local launch command, tests, and CI expectations, see [CONTRIBUTING.md](CONTRIBUTING.md).
 ## Verification
 
 Unit tests:

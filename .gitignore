@@ -21,3 +21,8 @@ Thumbs.db
 
 # Maven wrapper jar is intentionally not published; mvnw downloads it
 .mvn/wrapper/maven-wrapper.jar
+# Local private documentation
+PRIVATE_NOTES/
+*.private.md
+DEV_NOTES.local.md
+ROADMAP.local.md
